@@ -1,44 +1,30 @@
 const express = require("express")
-
 const router = express()
+const { db } = require("../config/dbConfig")
 
-let dataUser = []
-
-//_ get data
 router.get("/", (req, res) => {
-  res.send(dataUser)
-})
+  const sqlQuery = "SELECT * FROM user"
 
-//_ post data
-router.post("/", (req, res) => {
-  const payload = req.body
-  dataUser.push(payload)
-  res.send("data berhasil ditambahkan")
-})
-
-//_ get single data
-router.get("/:id", (req, res) => {
-  const param = req.params
-  const data = dataUser.find((item) => item.id == param.id)
-  res.send(data)
-})
-
-//_ delete data
-router.delete("/:id", (req, res) => {
-  const param = req.params
-  const data = dataUser.filter((item) => item.id != param.id)
-  res.send(data)
-})
-
-//_ update data
-router.put("/:id", (req, res) => {
-  const param = req.params
-  const newName = req.body.name
-  const newUsers = dataUser.map((item) => {
-    return item.id == param.id ? { ...item, name: newName } : item
+  db.query(sqlQuery, (error, result) => {
+    if (error) {
+      console.log(error)
+    } else {
+      res.send(result)
+    }
   })
-  dataUser = newUsers
-  res.send(newUsers)
+})
+
+router.get("/:id", (req, res) => {
+  const params = req.params
+  const sqlQuery = `SELECT * FROM user WHERE user_id = ${params.id}`
+
+  db.query(sqlQuery, (error, result) => {
+    if (error) {
+      console.log(error)
+    } else {
+      res.send(result)
+    }
+  })
 })
 
 module.exports = router
